@@ -6,8 +6,8 @@ Here's a basic example on how to subscribe people via ajax and populate them to 
 
 ## Configure
 You'll need to set up two things before test this code:
-- Add your list ID in subscription.php file, in line 21.
-- API token: Add your in subscription.php in line 24.
+- List ID: Add your List ID in subscription.php file, line 21.
+- API token: Add your in subscription.php line 24.
 
 ### API Token
 You will find your API token within your Sendicate Account, under: Manage / Account / API Token.
