@@ -17,28 +17,26 @@ include_once('lib/wrapper.php');
 
 
 
-// Your API Token
-$_api_token = 'xxxxxxxxxxxxxxxxxxxxxxxxxx';
+// Your List ID
+$_list_id	= 'xxxxxxxx';
 
+// Your API Token
+$_api_token = 'xxxxxxxxxxxxxxxxxxxx';
 
 
 
 if($_POST) {
 
 	// Initialize variables...
-	$_list_id = false;
-	$_subscriber_name = '';
-	$_subscriber_email = '';
+	$_subscriber_name = 'Guest Subscriber';
+	$_subscriber_email = false;
 
-
-	// Validate if LIST ID exists in $POST
-	if(isset($_POST['list_id'])) {
-		$_list_id = $_POST['list_id'];
-	}
 
 	// Validate if Name exists
 	if(isset($_POST['subscriber_name'])) {
-		$_subscriber_name = $_POST['subscriber_name'];
+		if($_POST['subscriber_name'] != '') {
+			$_subscriber_name = $_POST['subscriber_name'];
+		}
 	}
 
 	// Validate if Name exists
@@ -52,13 +50,23 @@ if($_POST) {
 	// }
 	
 
+	// Add validations for all fields that are required to post to Sendicate API
+	// Otherwise we need to fail
+	if(!$_subscriber_email) {
+		echo 'Please insert a valid email and try again...';
+		die();
+	}
+
+	
+	// Add your own validations above this comment.
+
 	/**
 	 * Build params to send
 	 * Uncoment last line to add one more field to the params.
 	 * 
 	 * Replace "fieldname_in_sendicate" with your Sendicate field name.
 	 * Replace "$_new_field_name" with the name of the php variable in previous lines.
-	 */ 
+	 */
 	$_params = array(
 		'name'		=> $_subscriber_name
 		,'email'	=> $_subscriber_email
@@ -66,31 +74,36 @@ if($_POST) {
 	);
 
 
+
 	/**
 	 * That's it! You don't need to keep changing things.
 	 * Accept them in the way how they are, and be free...
 	 */
-	if( $_list_id && $_params && is_array($_params) ) {
-		
-
-		$_sendicate = new Sendicate_Wrapper($_api_token);
-		$_url 		= 'lists/' . $_list_id . '/subscribers';
-
-
-		$_sendicate->callServer('POST', $_url, $_params);
-		
-		$response = $_sendicate->getResponse();
-
-		if($response && $response->imported = 1) {
-			echo 'Thanks for your subscription!';
-		} else {
-			echo 'Something fails when posting to Sendicate API, check the log details.';
-			echo $response->errors;
-		}
-
-	} else {
-		echo 'Check the form data, some values are not being received correctly.';
+	
+	// Validate if List ID exists
+	if(!$_list_id) {
+		echo 'No List ID configured.';
+		die();
 	}
+
+
+	$_sendicate = new Sendicate_Wrapper($_api_token);
+	$_sendicate->setDebug(false);
+
+	$_url 		= 'lists/' . $_list_id . '/subscribers';
+
+
+	$_sendicate->callServer('POST', $_url, $_params);
+	
+	$response = $_sendicate->getResponse();
+
+	if($response && $response->imported = 1) {
+		echo 'Thanks for your subscription!';
+	} else {
+		echo 'Something fails when posting to Sendicate API, check the log details.';
+		echo $response->errors;
+	}
+
 
 } else {
 	echo 'No data was received, check your form code.';
